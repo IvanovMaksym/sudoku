@@ -23,6 +23,8 @@ import static java.util.Collections.singletonList;
 public class SudokuService {
 
      private static Map<String, Board> boards = new ConcurrentHashMap<>();
+     private static final String DEALS_LINK = "www.dealsLink.com";
+     private static final String RESOURCE_EXPIRED_MESSAGE = "Resource expired";
      private final BoardFactory boardFactory;
      private final List<BoardValidator> validators;
 
@@ -45,7 +47,7 @@ public class SudokuService {
                throw new SudokuValidationException(
                        singletonList(new Error.Builder()
                                .withErrorType(ErrorType.RESOURCE_EXPIRED)
-                               .withDetails("Resource Id doesn't exist")
+                               .withDetails(RESOURCE_EXPIRED_MESSAGE)
                                .build()
                        ));
           }
@@ -83,6 +85,6 @@ public class SudokuService {
 
      private void setCompleted(Board board) {
           board.setBoardState(BoardState.COMPLETED);
-          board.setDealLinks("www.dealsLink.com");
+          board.setDealLinks(DEALS_LINK);
      }
 }
