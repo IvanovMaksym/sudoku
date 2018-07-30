@@ -14,10 +14,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 @Service
 public class SudokuService {
@@ -55,10 +57,14 @@ public class SudokuService {
      }
 
      public Board validateCell(Board board, Cell cell) {
-          List<Error> errors = validators.stream()
-                  .map(validator -> validator.validate(board, cell))
+          List<CompletableFuture<List<Error>>> futureResults = validators.stream()
+                  .map(validator -> supplyAsync(() -> validator.validate(board, cell)))
+                  .collect(Collectors.toList());
+          List<Error> errors = futureResults.stream()
+                  .map(CompletableFuture::join)
                   .flatMap(Collection::stream)
                   .collect(Collectors.toList());
+
           if (!errors.isEmpty()) {
                throw new SudokuValidationException(errors);
           }
